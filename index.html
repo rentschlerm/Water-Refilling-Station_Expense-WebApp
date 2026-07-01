@@ -3,321 +3,750 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1a5276">
-<title>Add Expense — Water Refilling</title>
+<meta name="theme-color" id="themeColor" content="#1a5276">
+<title>Account Tracker</title>
 <style>
-  :root{
-    --ink:#0f2a3d; --deep:#1a5276; --mid:#2980b9; --line:#d7e3ea;
-    --paper:#f4f8fb; --card:#ffffff; --muted:#6b8190;
-    --green:#1e8449; --red:#c0392b; --amber:#e67e22; --field:#fbfdfe;
-  }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0; padding:0;}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    background:linear-gradient(180deg,#e8f1f7 0%, var(--paper) 220px);
-    color:var(--ink); min-height:100vh; padding:0 0 40px;
-  }
-  header{
-    background:var(--deep); color:#fff; padding:18px 18px 16px;
-    display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:5; box-shadow:0 2px 10px rgba(26,82,118,.25);
-  }
-  header h1{font-size:18px; margin:0; font-weight:700; letter-spacing:.2px; display:flex; gap:8px; align-items:center;}
-  .gear{background:rgba(255,255,255,.14); border:none; color:#fff; width:38px; height:38px;
-    border-radius:10px; font-size:18px; cursor:pointer;}
-  .gear:active{background:rgba(255,255,255,.28);}
-  .wrap{max-width:520px; margin:0 auto; padding:16px;}
+:root {
+  --ink: #0f2a3d; --deep: #1a5276; --mid: #2980b9; --line: #d7e3ea;
+  --paper: #f4f8fb; --card: #ffffff; --muted: #6b8190;
+  --green: #1e8449; --red: #c0392b; --amber: #e67e22; --field: #fbfdfe;
+  --beach: #5d4037;
+}
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--paper); color: var(--ink); min-height: 100vh; padding: 0 0 48px;
+}
 
-  .card{background:var(--card); border:1px solid var(--line); border-radius:16px;
-    padding:18px; box-shadow:0 6px 22px rgba(15,42,61,.06); margin-bottom:16px;}
+/* ── Header ─────────────────────────────────────────── */
+header {
+  background: var(--deep); color: #fff;
+  padding: 13px 16px 0;
+  position: sticky; top: 0; z-index: 9;
+  box-shadow: 0 2px 12px rgba(26,82,118,.3);
+  transition: background .22s;
+}
+.hrow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+h1 { font-size: 17px; margin: 0; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+.gear {
+  background: rgba(255,255,255,.16); border: none; color: #fff;
+  width: 36px; height: 36px; border-radius: 10px;
+  font-size: 18px; cursor: pointer; flex-shrink: 0;
+}
+.gear:active { background: rgba(255,255,255,.32); }
 
-  label{display:block; font-size:12.5px; font-weight:700; color:var(--deep);
-    text-transform:uppercase; letter-spacing:.6px; margin:14px 0 6px;}
-  label:first-of-type{margin-top:0;}
-  input,select{
-    width:100%; font-size:17px; padding:13px 14px; border:1.5px solid var(--line);
-    border-radius:11px; background:var(--field); color:var(--ink); appearance:none;
-    font-family:inherit;
-  }
-  input:focus,select:focus{outline:none; border-color:var(--mid); background:#fff;}
-  .row{display:flex; gap:12px;}
-  .row > div{flex:1;}
-  .peso{position:relative;}
-  .peso input{padding-left:30px;}
-  .peso::before{content:"₱"; position:absolute; left:13px; top:50%; transform:translateY(-50%);
-    color:var(--muted); font-size:17px; font-weight:600; pointer-events:none;}
+/* Top tabs */
+.ttabs { display: flex; }
+.ttab {
+  flex: 1; padding: 9px 4px; font-size: 13px; font-weight: 700;
+  border: none; background: transparent;
+  color: rgba(255,255,255,.55); cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.ttab.on { color: #fff; border-bottom-color: rgba(255,255,255,.9); }
 
-  .typechip{margin-top:8px; font-size:13px; display:inline-flex; align-items:center; gap:6px;
-    padding:5px 11px; border-radius:999px; font-weight:700;}
-  .t-op{background:#e9f5ee; color:var(--green);}
-  .t-pay{background:#fdf0e6; color:var(--amber);}
+/* ── Layout ─────────────────────────────────────────── */
+.pane { display: none; }
+.pane.on { display: block; }
+.wrap { max-width: 520px; margin: 0 auto; padding: 14px 14px 4px; }
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 16px; padding: 18px;
+  box-shadow: 0 5px 18px rgba(15,42,61,.07); margin-bottom: 14px;
+}
 
-  button.submit{
-    width:100%; margin-top:20px; padding:16px; font-size:17px; font-weight:800;
-    letter-spacing:.3px; color:#fff; background:var(--deep); border:none;
-    border-radius:13px; cursor:pointer; transition:transform .05s, background .15s;
-  }
-  button.submit:active{transform:scale(.985); background:#15435f;}
-  button.submit:disabled{opacity:.55; cursor:default;}
+/* ── Form elements ──────────────────────────────────── */
+label {
+  display: block; font-size: 11.5px; font-weight: 700;
+  color: var(--deep); text-transform: uppercase; letter-spacing: .55px;
+  margin: 14px 0 5px;
+}
+label:first-of-type { margin-top: 0; }
+.opt { font-weight: 400; color: var(--muted); text-transform: none; letter-spacing: 0; font-size: 11px; }
+input, select, textarea {
+  display: block; width: 100%; font-size: 16px;
+  padding: 12px 13px; border: 1.5px solid var(--line);
+  border-radius: 11px; background: var(--field); color: var(--ink);
+  appearance: none; -webkit-appearance: none; font-family: inherit;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b8190' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+textarea {
+  resize: vertical; min-height: 66px;
+  font-size: 14px; padding: 10px 13px; line-height: 1.5;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--mid); background: #fff;
+}
+.r2 { display: flex; gap: 11px; }
+.r2 > div { flex: 1; min-width: 0; }
 
-  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(140%);
-    max-width:90%; background:#102b3d; color:#fff; padding:13px 18px; border-radius:12px;
-    font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,.3); transition:transform .35s cubic-bezier(.2,.9,.3,1.4);
-    z-index:20; text-align:center;}
-  .toast.show{transform:translateX(-50%) translateY(0);}
-  .toast.ok{background:#176c43;} .toast.err{background:#a93226;}
+/* ₱ prefix */
+.peso { position: relative; }
+.peso input { padding-left: 28px; }
+.peso::before {
+  content: "₱"; position: absolute; left: 12px;
+  top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 16px; font-weight: 600; pointer-events: none;
+}
 
-  .today-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:4px;}
-  .today-head h2{font-size:15px; margin:0; color:var(--deep);}
-  .today-total{font-size:18px; font-weight:800; color:var(--red);}
-  .today-date{font-size:12px; color:var(--muted); margin-bottom:12px;}
-  .exp{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid #eef3f6;}
-  .exp:first-of-type{border-top:none;}
-  .exp .cat{width:7px; height:36px; border-radius:4px; flex:none; background:var(--mid);}
-  .exp.pay .cat{background:var(--amber);}
-  .exp .body{flex:1; min-width:0;}
-  .exp .desc{font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .exp .meta{font-size:12px; color:var(--muted); margin-top:2px;}
-  .exp .amt{font-size:16px; font-weight:800; color:var(--ink); flex:none;}
-  .empty{color:var(--muted); font-size:14px; text-align:center; padding:18px 0; font-style:italic;}
-  .spin{display:inline-block; width:15px; height:15px; border:2.5px solid rgba(255,255,255,.35);
-    border-top-color:#fff; border-radius:50%; animation:r .7s linear infinite; vertical-align:-2px;}
-  @keyframes r{to{transform:rotate(360deg);}}
+/* Type chips */
+.chip {
+  display: inline-flex; align-items: center;
+  margin-top: 7px; font-size: 12.5px; font-weight: 700;
+  padding: 5px 11px; border-radius: 999px; user-select: none;
+}
+.op  { background: #e9f5ee; color: var(--green); }
+.pay { background: #fdf0e6; color: var(--amber); }
+.rem { background: #e9f5ee; color: var(--green); }
+.cap { background: #e8f4fd; color: var(--mid);   }
 
-  .setup{position:fixed; inset:0; background:rgba(8,24,35,.55); display:none;
-    align-items:center; justify-content:center; padding:20px; z-index:40;}
-  .setup.show{display:flex;}
-  .setup .box{background:#fff; border-radius:16px; padding:22px; max-width:440px; width:100%;}
-  .setup h3{margin:0 0 6px; color:var(--deep);}
-  .setup p{margin:0 0 14px; font-size:13.5px; color:var(--muted); line-height:1.5;}
-  .setup input{margin-bottom:14px; font-size:14px;}
-  .setup .acts{display:flex; gap:10px;}
-  .setup button{flex:1; padding:13px; border-radius:11px; border:none; font-weight:700; font-size:15px; cursor:pointer;}
-  .setup .save{background:var(--deep); color:#fff;}
-  .setup .cancel{background:#eef3f6; color:var(--ink);}
-  @media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important;}}
+/* ── Buttons ─────────────────────────────────────────── */
+.btn {
+  display: block; width: 100%; margin-top: 16px; padding: 15px;
+  font-size: 16px; font-weight: 800; letter-spacing: .25px;
+  color: #fff; background: var(--deep); border: none;
+  border-radius: 13px; cursor: pointer;
+  transition: transform .05s, filter .12s;
+}
+.btn:active  { transform: scale(.986); filter: brightness(.88); }
+.btn:disabled{ opacity: .55; cursor: default; }
+.btn-r { background: var(--beach); }
+.btn-g { background: var(--green); }
+
+/* ── Resort inner tabs ──────────────────────────────── */
+.itabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.itab {
+  flex: 1; padding: 10px 6px; font-size: 13.5px; font-weight: 700;
+  border: 2px solid var(--line); border-radius: 11px;
+  background: #fff; color: var(--muted); cursor: pointer; transition: all .13s;
+}
+.itab.on { background: var(--beach); color: #fff; border-color: var(--beach); }
+
+/* ── Today cards ─────────────────────────────────────── */
+.today-hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 3px; }
+.today-hd h2 { font-size: 14.5px; margin: 0; color: var(--deep); }
+.today-total  { font-size: 17px; font-weight: 800; }
+.today-dt     { font-size: 11.5px; color: var(--muted); margin-bottom: 10px; }
+.net-row { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; font-size: 12.5px; }
+.net-row .lbl { color: var(--muted); font-weight: 600; }
+
+/* Transaction rows */
+.tx { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #eef3f6; }
+.tx:first-of-type { border-top: none; }
+.tx .bar  { width: 6px; height: 34px; border-radius: 4px; flex: none; background: var(--mid); }
+.tx.xpay  .bar { background: var(--amber); }
+.tx.xinc  .bar { background: var(--green); }
+.tx .bd   { flex: 1; min-width: 0; }
+.tx .dn   { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx .mt   { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.tx .am   { font-size: 14.5px; font-weight: 800; color: var(--ink); flex: none; }
+.tx.xinc  .am { color: var(--green); }
+.nil { color: var(--muted); font-size: 13.5px; text-align: center; padding: 16px 0; font-style: italic; }
+
+/* Spinner */
+.spin {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2.5px solid rgba(255,255,255,.3); border-top-color: #fff;
+  border-radius: 50%; animation: sp .7s linear infinite; vertical-align: -2px;
+}
+@keyframes sp { to { transform: rotate(360deg); } }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; bottom: 22px;
+  transform: translateX(-50%) translateY(160%);
+  max-width: 92%; background: #102b3d; color: #fff;
+  padding: 12px 17px; border-radius: 12px; font-size: 13.5px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.27);
+  transition: transform .35s cubic-bezier(.2,.9,.3,1.4);
+  z-index: 30; text-align: center; pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.ok  { background: #176c43; }
+.toast.err { background: #a93226; }
+
+/* ── Settings modal ──────────────────────────────────── */
+.modal {
+  position: fixed; inset: 0; background: rgba(8,24,35,.55);
+  display: none; align-items: flex-start; justify-content: center;
+  padding: 56px 14px 20px; z-index: 40; overflow-y: auto;
+}
+.modal.show { display: flex; }
+.mbox { background: #fff; border-radius: 16px; padding: 20px; max-width: 440px; width: 100%; }
+.mbox h3 { margin: 0 0 16px; color: var(--deep); font-size: 16px; }
+.ub { margin-bottom: 14px; }
+.ub h4 {
+  margin: 0 0 3px; font-size: 10.5px; font-weight: 700; color: var(--deep);
+  text-transform: uppercase; letter-spacing: .55px;
+}
+.ub p { margin: 0 0 7px; font-size: 12px; color: var(--muted); line-height: 1.4; }
+.ub input { font-size: 13px; }
+.macts { display: flex; gap: 9px; margin-top: 16px; }
+.macts button { flex: 1; padding: 13px; border-radius: 11px; border: none; font-weight: 700; font-size: 15px; cursor: pointer; }
+.msave   { background: var(--deep); color: #fff; }
+.mcancel { background: #eef3f6; color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
 </style>
 </head>
 <body>
-<header>
-  <h1>💧 Add Expense</h1>
-  <button class="gear" id="gear" title="Settings" aria-label="Settings">⚙︎</button>
+
+<!-- ══════════════════════ HEADER ══════════════════════ -->
+<header id="header">
+  <div class="hrow">
+    <h1 id="htitle">💧 Water Refilling</h1>
+    <button class="gear" id="gearBtn" aria-label="Settings">⚙︎</button>
+  </div>
+  <div class="ttabs">
+    <button class="ttab on" data-tab="water"  onclick="switchTab('water')">💧 Water Refilling</button>
+    <button class="ttab"    data-tab="resort" onclick="switchTab('resort')">🏖️ Resort</button>
+  </div>
 </header>
 
-<div class="wrap">
-  <div class="card">
-    <label for="date">Date</label>
-    <input type="date" id="date">
+<!-- ══════════════════════ WATER REFILLING ══════════════════════ -->
+<div id="pane-water" class="pane on">
+  <div class="wrap">
 
-    <label for="desc">Description</label>
-    <input type="text" id="desc" placeholder="e.g. Meralco bill, caps, driver salary" autocomplete="off">
+    <div class="card">
+      <label for="w-date">Date</label>
+      <input type="date" id="w-date">
 
-    <div class="row">
-      <div>
-        <label for="qty">Quantity</label>
-        <input type="number" id="qty" value="1" min="0" inputmode="decimal">
+      <label for="w-desc">Description</label>
+      <select id="w-desc">
+        <option value="">— select description —</option>
+        <option>Diesel</option>
+        <option>Motorcycle Gas</option>
+        <option>Weekly Stocks</option>
+        <option>NS Caps</option>
+        <option>Sealant</option>
+        <option>Room Cleaning</option>
+        <option>Salary</option>
+        <option>miscellaneous</option>
+        <option>Electric</option>
+        <option>Water</option>
+        <option>Muriatic Acid</option>
+        <option>Tax(Permit)</option>
+        <option>Monthly remit</option>
+        <option>Unaccounted for</option>
+        <option>Cash Advance</option>
+        <option>Motor</option>
+      </select>
+
+      <label for="w-notes">Notes <span class="opt">(optional)</span></label>
+      <textarea id="w-notes" placeholder="Vendor, reference number, extra details…"></textarea>
+
+      <div class="r2">
+        <div>
+          <label for="w-qty">Quantity</label>
+          <input type="number" id="w-qty" value="1" min="0" inputmode="decimal">
+        </div>
+        <div>
+          <label for="w-amt">Amount</label>
+          <div class="peso">
+            <input type="number" id="w-amt" placeholder="0.00" min="0" inputmode="decimal">
+          </div>
+        </div>
       </div>
-      <div>
-        <label for="amount">Amount</label>
-        <div class="peso"><input type="number" id="amount" placeholder="0.00" min="0" inputmode="decimal"></div>
-      </div>
+
+      <label for="w-cat">Category</label>
+      <select id="w-cat"></select>
+      <div id="w-chip" class="chip op">● Operating Expense</div>
+
+      <button class="btn" id="w-save">Save expense</button>
     </div>
 
-    <label for="category">Category</label>
-    <select id="category"></select>
-    <div id="typechip" class="typechip t-op">Operating Expense</div>
+    <div class="card">
+      <div class="today-hd">
+        <h2>Today's expenses</h2>
+        <span class="today-total" id="w-total" style="color:var(--red)">₱0.00</span>
+      </div>
+      <div class="today-dt" id="w-dt">—</div>
+      <div id="w-list"><div class="nil">Loading…</div></div>
+    </div>
 
-    <button class="submit" id="save">Save expense</button>
   </div>
+</div>
 
-  <div class="card">
-    <div class="today-head">
-      <h2>Today's expenses</h2>
-      <span class="today-total" id="todayTotal">₱0.00</span>
+<!-- ══════════════════════ RESORT ══════════════════════ -->
+<div id="pane-resort" class="pane">
+  <div class="wrap">
+
+    <!-- Inner tabs -->
+    <div class="itabs">
+      <button class="itab on" id="ri-etab" onclick="resortTab('exp')">📤 Expense</button>
+      <button class="itab"    id="ri-itab" onclick="resortTab('inc')">📥 Income</button>
     </div>
-    <div class="today-date" id="todayDate">—</div>
-    <div id="list"><div class="empty">Loading…</div></div>
+
+    <!-- Resort Expense Form -->
+    <div id="r-eform">
+      <div class="card">
+        <label for="re-date">Date</label>
+        <input type="date" id="re-date">
+
+        <label for="re-desc">Description</label>
+        <input type="text" id="re-desc" placeholder="e.g. Meralco, staff salary, supplies" autocomplete="off">
+
+        <label for="re-notes">Notes <span class="opt">(optional)</span></label>
+        <textarea id="re-notes" placeholder="Invoice #, vendor, extra details…"></textarea>
+
+        <div class="r2">
+          <div>
+            <label for="re-qty">Quantity</label>
+            <input type="number" id="re-qty" value="1" min="0" inputmode="decimal">
+          </div>
+          <div>
+            <label for="re-amt">Amount</label>
+            <div class="peso">
+              <input type="number" id="re-amt" placeholder="0.00" min="0" inputmode="decimal">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-r" id="re-save">Save expense</button>
+      </div>
+    </div>
+
+    <!-- Resort Income Form -->
+    <div id="r-iform" style="display:none">
+      <div class="card">
+        <label for="ri-date">Date</label>
+        <input type="date" id="ri-date">
+
+        <label for="ri-desc">Description</label>
+        <input type="text" id="ri-desc" placeholder="e.g. Room booking, event payment" autocomplete="off">
+
+        <label for="ri-notes">Notes <span class="opt">(optional)</span></label>
+        <textarea id="ri-notes" placeholder="Booking ref, pax count, remarks…"></textarea>
+
+        <div class="r2">
+          <div>
+            <label for="ri-qty">Quantity</label>
+            <input type="number" id="ri-qty" value="1" min="0" inputmode="decimal">
+          </div>
+          <div>
+            <label for="ri-amt">Amount</label>
+            <div class="peso">
+              <input type="number" id="ri-amt" placeholder="0.00" min="0" inputmode="decimal">
+            </div>
+          </div>
+        </div>
+
+        <label for="ri-type">Type</label>
+        <select id="ri-type">
+          <option value="Remittance">Remittance</option>
+          <option value="Capital Injection">Capital Injection</option>
+        </select>
+        <div id="ri-chip" class="chip rem">● Remittance (operations)</div>
+
+        <button class="btn btn-g" id="ri-save">Save income</button>
+      </div>
+    </div>
+
+    <!-- Resort Today's Transactions -->
+    <div class="card">
+      <div class="today-hd">
+        <h2>Today's transactions</h2>
+        <span class="today-total" id="r-net" style="color:var(--beach)">—</span>
+      </div>
+      <div class="today-dt" id="r-dt">—</div>
+      <div class="net-row">
+        <span class="lbl">In:</span>
+        <span id="r-in" style="font-weight:800; color:var(--green)">₱0.00</span>
+        <span class="lbl" style="margin-left:3px">Out:</span>
+        <span id="r-out" style="font-weight:800; color:var(--red)">₱0.00</span>
+      </div>
+      <div id="r-list"><div class="nil">Loading…</div></div>
+    </div>
+
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<div class="setup" id="setup">
-  <div class="box">
-    <h3>Connect to your sheet</h3>
-    <p>Paste the Web App URL from your spreadsheet menu:
-       <b>💧 Water Refilling Account → 📱 Get Scanner URL</b>. It looks like
-       <i>https://script.google.com/macros/s/…/exec</i></p>
-    <input type="url" id="urlInput" placeholder="https://script.google.com/macros/s/…/exec">
-    <div class="acts">
-      <button class="cancel" id="setupCancel">Cancel</button>
-      <button class="save" id="setupSave">Save</button>
+<!-- ══════════════════════ SETTINGS MODAL ══════════════════════ -->
+<div class="modal" id="modal">
+  <div class="mbox">
+    <h3>⚙︎ Web App URLs</h3>
+
+    <div class="ub">
+      <h4>💧 Water Refilling</h4>
+      <p>In your Water Refilling sheet:<br>
+         <b>💧 Water Refilling Account → 📱 Get Scanner URL</b></p>
+      <input type="url" id="urlWR" placeholder="https://script.google.com/macros/s/…/exec">
+    </div>
+
+    <div class="ub">
+      <h4>🏖️ Resort Account</h4>
+      <p>Deploy the web app in your Resort sheet and paste the URL here.</p>
+      <input type="url" id="urlRT" placeholder="https://script.google.com/macros/s/…/exec">
+    </div>
+
+    <div class="macts">
+      <button class="mcancel" id="mCancel">Cancel</button>
+      <button class="msave"   id="mSave">Save</button>
     </div>
   </div>
 </div>
 
 <script>
-  var URL_KEY = 'wr_expense_webapp_url';
-  var FALLBACK_CATS = ['Operation','Salaries/Wages','Fuel/Gas','Electricity','Water','Internet','Payables','Others'];
+/* ──────────────────────────────────────────────────────
+   CONSTANTS
+────────────────────────────────────────────────────── */
+var K_WR = 'wr_expense_webapp_url';
+var K_RT = 'resort_webapp_url';
 
-  var $ = function(id){ return document.getElementById(id); };
-  function getUrl(){ return localStorage.getItem(URL_KEY) || ''; }
-  function setUrl(u){ localStorage.setItem(URL_KEY, u.trim()); }
-  function typeOf(cat){ return String(cat).indexOf('Payables') === 0 ? 'Payables' : 'Operating Expense'; }
+// Maps each description option to its category
+var WR_DESC_CAT = {
+  'Diesel'          : 'Fuel/Gas',
+  'Motorcycle Gas'  : 'Fuel/Gas',
+  'Weekly Stocks'   : 'Operation',
+  'NS Caps'         : 'Operation',
+  'Sealant'         : 'Operation',
+  'Room Cleaning'   : 'Operation',
+  'Salary'          : 'Salaries/Wages',
+  'miscellaneous'   : 'Others',
+  'Electric'        : 'Electricity',
+  'Water'           : 'Water',
+  'Muriatic Acid'   : 'Operation',
+  'Tax(Permit)'     : 'Others',
+  'Monthly remit'   : 'Payables',
+  'Unaccounted for' : 'Others',
+  'Cash Advance'    : 'Payables',
+  'Motor'           : 'Operation'
+};
 
-  // ---- JSONP (same cross-origin trick as the water scanner) ----
-  function jsonp(params){
-    return new Promise(function(resolve, reject){
-      var url = getUrl();
-      if(!url){ reject(new Error('No Web App URL set')); return; }
-      var cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random()*1e6);
-      var s = document.createElement('script');
-      var done = false;
-      var timer = setTimeout(function(){ if(!done){ cleanup(); reject(new Error('Request timed out')); } }, 25000);
-      function cleanup(){ done = true; clearTimeout(timer); try{ delete window[cb]; }catch(e){ window[cb]=undefined; }
-        if(s && s.parentNode) s.parentNode.removeChild(s); }
-      window[cb] = function(data){ cleanup(); resolve(data); };
-      var q = Object.keys(params).map(function(k){
-        return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
-      s.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + q + '&callback=' + cb;
-      s.onerror = function(){ cleanup(); reject(new Error('Network error — check the URL')); };
-      document.body.appendChild(s);
+var WR_CATS = ['Operation','Salaries/Wages','Fuel/Gas','Electricity','Water','Internet','Payables','Others'];
+
+/* ──────────────────────────────────────────────────────
+   UTILITIES
+────────────────────────────────────────────────────── */
+var $ = function(id){ return document.getElementById(id); };
+function getWR(){ return localStorage.getItem(K_WR) || ''; }
+function getRT(){ return localStorage.getItem(K_RT) || ''; }
+
+function todayISO(){
+  var d = new Date();
+  return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+function pesos(n){
+  return '₱'+(Number(n)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+/* ──────────────────────────────────────────────────────
+   JSONP (cross-origin calls to Google Apps Script)
+────────────────────────────────────────────────────── */
+function jsonp(url, params){
+  return new Promise(function(resolve, reject){
+    if(!url){ reject(new Error('URL not configured — tap ⚙︎ Settings')); return; }
+    var cb = 'cb_'+Date.now()+'_'+Math.floor(Math.random()*1e6);
+    var el = document.createElement('script');
+    var done = false;
+    var timer = setTimeout(function(){
+      if(!done){ cleanup(); reject(new Error('Request timed out')); }
+    }, 25000);
+    function cleanup(){
+      done=true; clearTimeout(timer);
+      try{ delete window[cb]; }catch(e){ window[cb]=undefined; }
+      if(el.parentNode) el.parentNode.removeChild(el);
+    }
+    window[cb] = function(data){ cleanup(); resolve(data); };
+    var qs = Object.keys(params).map(function(k){
+      return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);
+    }).join('&');
+    el.src = url+(url.indexOf('?')>=0?'&':'?')+qs+'&callback='+cb;
+    el.onerror = function(){ cleanup(); reject(new Error('Network error — check URL in ⚙︎')); };
+    document.body.appendChild(el);
+  });
+}
+
+/* ──────────────────────────────────────────────────────
+   TOAST
+────────────────────────────────────────────────────── */
+var _tt;
+function toast(msg, kind){
+  var el=$('toast');
+  el.textContent=msg;
+  el.className='toast show'+(kind?' '+kind:'');
+  clearTimeout(_tt);
+  _tt=setTimeout(function(){ el.className='toast'+(kind?' '+kind:''); }, 3400);
+}
+
+/* ──────────────────────────────────────────────────────
+   TAB SWITCHING
+────────────────────────────────────────────────────── */
+function switchTab(name){
+  document.querySelectorAll('.ttab').forEach(function(b){
+    b.classList.toggle('on', b.dataset.tab===name);
+  });
+  document.querySelectorAll('.pane').forEach(function(p){ p.classList.remove('on'); });
+  $('pane-'+name).classList.add('on');
+
+  var isResort = name==='resort';
+  $('header').style.background = isResort ? 'var(--beach)' : 'var(--deep)';
+  $('htitle').textContent      = isResort ? '🏖️ Resort Account' : '💧 Water Refilling';
+  var tc = document.querySelector('meta[name="theme-color"]');
+  if(tc) tc.content = isResort ? '#5d4037' : '#1a5276';
+
+  if(name==='water'  && getWR()) loadWRToday();
+  if(name==='resort' && getRT()) loadRToday();
+}
+
+function resortTab(type){
+  $('ri-etab').classList.toggle('on', type==='exp');
+  $('ri-itab').classList.toggle('on', type==='inc');
+  $('r-eform').style.display = type==='exp' ? '' : 'none';
+  $('r-iform').style.display = type==='inc' ? '' : 'none';
+}
+
+/* ──────────────────────────────────────────────────────
+   WATER REFILLING — Categories & chip
+────────────────────────────────────────────────────── */
+function fillCats(cats){
+  var sel=$('w-cat'); sel.innerHTML='';
+  cats.forEach(function(c){
+    var o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o);
+  });
+  updateWChip();
+}
+
+function updateWChip(){
+  var cat=$('w-cat').value, pay=cat.indexOf('Payables')===0;
+  var ch=$('w-chip');
+  ch.textContent = pay ? '● Payables (debt / loan)' : '● Operating Expense';
+  ch.className   = 'chip '+(pay?'pay':'op');
+}
+
+// Auto-select the category when a description is picked
+function autoSetCat(desc){
+  var cat=WR_DESC_CAT[desc]; if(!cat) return;
+  var sel=$('w-cat');
+  for(var i=0;i<sel.options.length;i++){
+    if(sel.options[i].value===cat){ sel.selectedIndex=i; break; }
+  }
+  updateWChip();
+}
+
+/* ──────────────────────────────────────────────────────
+   WATER REFILLING — Today's list
+────────────────────────────────────────────────────── */
+function loadWRToday(){
+  jsonp(getWR(),{action:'getTodaysExpenses'}).then(function(r){
+    if(!r||!r.success) return;
+    $('w-dt').textContent    = r.date ? 'For '+r.date : '';
+    $('w-total').textContent = pesos(r.total);
+    var list=$('w-list');
+    if(!r.entries||!r.entries.length){
+      list.innerHTML='<div class="nil">No expenses logged today yet.</div>'; return;
+    }
+    list.innerHTML='';
+    r.entries.forEach(function(e){
+      var pay=(e.category||e.type||'').indexOf('Payables')===0;
+      var row=document.createElement('div');
+      row.className='tx'+(pay?' xpay':'');
+      row.innerHTML='<div class="bar"></div><div class="bd"><div class="dn"></div><div class="mt"></div></div><div class="am"></div>';
+      row.querySelector('.dn').textContent=e.desc;
+      row.querySelector('.mt').textContent=e.id+' · '+(e.category||e.type||'')+(e.qty>1?' · x'+e.qty:'');
+      row.querySelector('.am').textContent=pesos(e.amount);
+      list.appendChild(row);
     });
-  }
+  }).catch(function(){});
+}
 
-  // ---- Toast ----
-  var toastTimer;
-  function toast(msg, kind){
-    var t = $('toast');
-    t.textContent = msg;
-    t.className = 'toast show' + (kind ? ' ' + kind : '');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.className = 'toast' + (kind ? ' ' + kind : ''); }, 3200);
-  }
+/* ──────────────────────────────────────────────────────
+   WATER REFILLING — Save expense
+────────────────────────────────────────────────────── */
+function saveWR(){
+  var desc  = $('w-desc').value.trim();
+  var notes = $('w-notes').value.trim();
+  var amt   = parseFloat($('w-amt').value);
 
-  // ---- Categories ----
-  function fillCategories(cats){
-    var sel = $('category');
-    sel.innerHTML = '';
-    cats.forEach(function(c){
-      var o = document.createElement('option');
-      o.value = c; o.textContent = c; sel.appendChild(o);
+  if(!desc)        { toast('Select a description first','err'); $('w-desc').focus(); return; }
+  if(!amt||amt<=0) { toast('Enter an amount','err');            $('w-amt').focus();  return; }
+
+  // Append notes to description when present
+  var fullDesc = notes ? desc+' — '+notes : desc;
+  var btn=$('w-save'), lbl=btn.textContent;
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Saving…';
+
+  jsonp(getWR(),{
+    action:'addExpense', date:$('w-date').value,
+    description:fullDesc, quantity:$('w-qty').value||1,
+    amount:amt, category:$('w-cat').value
+  }).then(function(r){
+    btn.disabled=false; btn.textContent=lbl;
+    if(r&&r.success){
+      toast('Saved · '+r.id+' · '+(r.category||''),'ok');
+      $('w-desc').value=''; $('w-notes').value=''; $('w-qty').value=1; $('w-amt').value='';
+      loadWRToday();
+    } else { toast((r&&r.message)||'Could not save','err'); }
+  }).catch(function(e){ btn.disabled=false; btn.textContent=lbl; toast(e.message,'err'); });
+}
+
+/* ──────────────────────────────────────────────────────
+   RESORT — Income type chip
+────────────────────────────────────────────────────── */
+function updateRIChip(){
+  var t=$('ri-type').value, cap=t==='Capital Injection';
+  var ch=$('ri-chip');
+  ch.textContent = cap ? '● Capital Injection (owner funds)' : '● Remittance (operations)';
+  ch.className   = 'chip '+(cap?'cap':'rem');
+}
+
+/* ──────────────────────────────────────────────────────
+   RESORT — Today's transactions
+────────────────────────────────────────────────────── */
+function loadRToday(){
+  jsonp(getRT(),{action:'getTodaysTransactions'}).then(function(r){
+    if(!r||!r.success) return;
+    $('r-dt').textContent  = r.date ? 'For '+r.date : '';
+    $('r-in').textContent  = pesos(r.totalIncome  || 0);
+    $('r-out').textContent = pesos(r.totalExpense || 0);
+    var net=(r.totalIncome||0)-(r.totalExpense||0);
+    $('r-net').textContent = 'Net: '+pesos(net);
+    $('r-net').style.color = net<0 ? 'var(--red)' : 'var(--green)';
+    var list=$('r-list');
+    if(!r.entries||!r.entries.length){
+      list.innerHTML='<div class="nil">No transactions today yet.</div>'; return;
+    }
+    list.innerHTML='';
+    r.entries.forEach(function(e){
+      var isInc=e.kind==='Income';
+      var row=document.createElement('div');
+      row.className='tx'+(isInc?' xinc':'');
+      row.innerHTML='<div class="bar"></div><div class="bd"><div class="dn"></div><div class="mt"></div></div><div class="am"></div>';
+      row.querySelector('.dn').textContent=e.desc;
+      row.querySelector('.mt').textContent=e.id+' · '+(e.type||e.kind||'')+(e.qty>1?' · x'+e.qty:'');
+      row.querySelector('.am').textContent=(isInc?'+':'−')+pesos(e.amount);
+      list.appendChild(row);
     });
-    updateTypeChip();
-  }
-  function updateTypeChip(){
-    var cat = $('category').value;
-    var isPay = typeOf(cat) === 'Payables';
-    var chip = $('typechip');
-    chip.textContent = isPay ? 'Payables (debt / loan)' : 'Operating Expense';
-    chip.className = 'typechip ' + (isPay ? 't-pay' : 't-op');
-  }
+  }).catch(function(){});
+}
 
-  // ---- Today's list ----
-  function pesos(n){ return '₱' + (Number(n)||0).toLocaleString('en-PH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-  function loadToday(){
-    jsonp({ action:'getTodaysExpenses' }).then(function(r){
-      if(!r || !r.success){ return; }
-      $('todayDate').textContent = r.date ? ('For ' + r.date) : '';
-      $('todayTotal').textContent = pesos(r.total);
-      var list = $('list');
-      if(!r.entries || r.entries.length === 0){
-        list.innerHTML = '<div class="empty">No expenses logged today yet.</div>';
-        return;
-      }
-      list.innerHTML = '';
-      r.entries.forEach(function(e){
-        var isPay = typeOf(e.category) === 'Payables';
-        var row = document.createElement('div');
-        row.className = 'exp' + (isPay ? ' pay' : '');
-        row.innerHTML =
-          '<div class="cat"></div>' +
-          '<div class="body">' +
-            '<div class="desc"></div>' +
-            '<div class="meta"></div>' +
-          '</div>' +
-          '<div class="amt"></div>';
-        row.querySelector('.desc').textContent = e.desc;
-        row.querySelector('.meta').textContent = e.id + ' · ' + e.category + (e.qty > 1 ? ' · x' + e.qty : '');
-        row.querySelector('.amt').textContent = pesos(e.amount);
-        list.appendChild(row);
-      });
-    }).catch(function(){ /* leave previous list */ });
-  }
+/* ──────────────────────────────────────────────────────
+   RESORT — Save Expense
+────────────────────────────────────────────────────── */
+function saveRExp(){
+  var desc  = $('re-desc').value.trim();
+  var notes = $('re-notes').value.trim();
+  var amt   = parseFloat($('re-amt').value);
 
-  // ---- Submit ----
-  function save(){
-    var desc = $('desc').value.trim();
-    var amount = parseFloat($('amount').value);
-    if(!desc){ toast('Add a description first', 'err'); $('desc').focus(); return; }
-    if(!amount || amount <= 0){ toast('Enter an amount', 'err'); $('amount').focus(); return; }
+  if(!desc)        { toast('Add a description','err'); $('re-desc').focus(); return; }
+  if(!amt||amt<=0) { toast('Enter an amount','err');   $('re-amt').focus();  return; }
 
-    var btn = $('save');
-    var label = btn.textContent;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spin"></span> Saving…';
+  var fullDesc=notes?desc+' — '+notes:desc;
+  var btn=$('re-save'), lbl=btn.textContent;
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Saving…';
 
-    jsonp({
-      action:'addExpense',
-      date: $('date').value,
-      description: desc,
-      quantity: $('qty').value || 1,
-      amount: amount,
-      category: $('category').value
-    }).then(function(r){
-      btn.disabled = false; btn.textContent = label;
-      if(r && r.success){
-        toast('Saved · ' + r.id + ' · ' + r.category, 'ok');
-        // reset for the next entry, keep the date
-        $('desc').value = ''; $('qty').value = 1; $('amount').value = '';
-        $('desc').focus();
-        loadToday();
-      } else {
-        toast((r && r.message) ? r.message : 'Could not save', 'err');
-      }
-    }).catch(function(err){
-      btn.disabled = false; btn.textContent = label;
-      toast(err.message || 'Could not reach the sheet', 'err');
-    });
-  }
+  jsonp(getRT(),{
+    action:'addExpense', date:$('re-date').value,
+    description:fullDesc, quantity:$('re-qty').value||1, amount:amt
+  }).then(function(r){
+    btn.disabled=false; btn.textContent=lbl;
+    if(r&&r.success){
+      toast('Saved · '+(r.id||''),'ok');
+      $('re-desc').value=''; $('re-notes').value=''; $('re-qty').value=1; $('re-amt').value='';
+      loadRToday();
+    } else { toast((r&&r.message)||'Could not save','err'); }
+  }).catch(function(e){ btn.disabled=false; btn.textContent=lbl; toast(e.message,'err'); });
+}
 
-  // ---- Setup dialog ----
-  function openSetup(){ $('urlInput').value = getUrl(); $('setup').classList.add('show'); }
-  function closeSetup(){ $('setup').classList.remove('show'); }
+/* ──────────────────────────────────────────────────────
+   RESORT — Save Income
+────────────────────────────────────────────────────── */
+function saveRInc(){
+  var desc  = $('ri-desc').value.trim();
+  var notes = $('ri-notes').value.trim();
+  var amt   = parseFloat($('ri-amt').value);
 
-  // ---- Init ----
-  function init(){
-    // default date = today (local)
-    var d = new Date();
-    var iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    $('date').value = iso;
+  if(!desc)        { toast('Add a description','err'); $('ri-desc').focus(); return; }
+  if(!amt||amt<=0) { toast('Enter an amount','err');   $('ri-amt').focus();  return; }
 
-    $('category').addEventListener('change', updateTypeChip);
-    $('save').addEventListener('click', save);
-    $('gear').addEventListener('click', openSetup);
-    $('setupCancel').addEventListener('click', closeSetup);
-    $('setupSave').addEventListener('click', function(){
-      var u = $('urlInput').value.trim();
-      if(!u){ toast('Paste the Web App URL', 'err'); return; }
-      setUrl(u); closeSetup(); toast('Connected', 'ok');
-      boot();
-    });
+  var fullDesc=notes?desc+' — '+notes:desc;
+  var btn=$('ri-save'), lbl=btn.textContent;
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Saving…';
 
-    fillCategories(FALLBACK_CATS);
+  jsonp(getRT(),{
+    action:'addIncome', date:$('ri-date').value,
+    description:fullDesc, quantity:$('ri-qty').value||1,
+    amount:amt, type:$('ri-type').value
+  }).then(function(r){
+    btn.disabled=false; btn.textContent=lbl;
+    if(r&&r.success){
+      toast('Saved · '+(r.id||''),'ok');
+      $('ri-desc').value=''; $('ri-notes').value=''; $('ri-qty').value=1; $('ri-amt').value='';
+      $('ri-type').value='Remittance'; updateRIChip();
+      loadRToday();
+    } else { toast((r&&r.message)||'Could not save','err'); }
+  }).catch(function(e){ btn.disabled=false; btn.textContent=lbl; toast(e.message,'err'); });
+}
 
-    if(!getUrl()){ openSetup(); } else { boot(); }
-  }
+/* ──────────────────────────────────────────────────────
+   SETTINGS MODAL
+────────────────────────────────────────────────────── */
+function openModal(){
+  $('urlWR').value = getWR();
+  $('urlRT').value = getRT();
+  $('modal').classList.add('show');
+}
+function closeModal(){ $('modal').classList.remove('show'); }
 
-  function boot(){
-    // pull live category list (keeps the dropdown in sync with your CONFIG)
-    jsonp({ action:'getExpenseConfig' }).then(function(r){
-      if(r && r.success && r.categories && r.categories.length){ fillCategories(r.categories); }
-    }).catch(function(){ /* keep fallback */ });
-    loadToday();
-  }
+/* ──────────────────────────────────────────────────────
+   INIT
+────────────────────────────────────────────────────── */
+function init(){
+  var iso = todayISO();
+  ['w-date','re-date','ri-date'].forEach(function(id){ $(id).value=iso; });
 
-  init();
+  // Water Refilling
+  $('w-cat').addEventListener('change',  updateWChip);
+  $('w-desc').addEventListener('change', function(){ autoSetCat(this.value); });
+  $('w-save').addEventListener('click',  saveWR);
+
+  // Resort
+  $('ri-type').addEventListener('change', updateRIChip);
+  $('re-save').addEventListener('click',  saveRExp);
+  $('ri-save').addEventListener('click',  saveRInc);
+
+  // Settings
+  $('gearBtn').addEventListener('click', openModal);
+  $('mCancel').addEventListener('click', closeModal);
+  $('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+  $('mSave').addEventListener('click', function(){
+    var u1=$('urlWR').value.trim(), u2=$('urlRT').value.trim();
+    if(u1) localStorage.setItem(K_WR, u1);
+    if(u2) localStorage.setItem(K_RT, u2);
+    closeModal(); toast('Settings saved','ok');
+    if(u1) bootWR();
+    if(u2) bootRT();
+  });
+
+  fillCats(WR_CATS);
+
+  if(!getWR()&&!getRT()){ openModal(); }
+  else { if(getWR()) bootWR(); if(getRT()) bootRT(); }
+}
+
+function bootWR(){
+  // Pull live category list from the sheet (keeps dropdown in sync with CONFIG)
+  jsonp(getWR(),{action:'getExpenseConfig'}).then(function(r){
+    if(r&&r.success&&r.categories&&r.categories.length) fillCats(r.categories);
+  }).catch(function(){});
+  loadWRToday();
+}
+
+function bootRT(){ loadRToday(); }
+
+init();
 </script>
 </body>
 </html>
